@@ -1,23 +1,8 @@
-"use client";
-
 import { products } from "@/lib/products";
-import { useSession, signIn } from "next-auth/react";
-import { useRouter } from "next/navigation";
+import Link from "next/link";
 
 export function ProductHighlights() {
-  const { data: session } = useSession();
-  const router = useRouter();
-
-  const handleViewDetails = (id: string) => {
-    if (!session) {
-      // Redirect to login if not logged in
-      router.push("/login");
-    } else {
-      // Go to product details page if logged in
-      router.push(`/products/${id}`);
-    }
-  };
-
+  
   return (
     <section className="py-16 px-4 bg-gray-50">
       <h2 className="text-3xl font-extrabold text-center mb-12 text-gray-900">
@@ -29,17 +14,19 @@ export function ProductHighlights() {
             key={p.id}
             className="bg-white rounded-xl shadow-lg overflow-hidden transform transition hover:-translate-y-2 hover:shadow-2xl"
           >
+           
+
             {/* Product Info */}
             <div className="p-6 flex flex-col gap-3">
               <h3 className="text-xl font-bold text-gray-900">{p.name}</h3>
               <p className="text-gray-700 line-clamp-3">{p.description}</p>
               <p className="text-blue-600 font-semibold text-lg">${p.price}</p>
-              <button
-                onClick={() => handleViewDetails(p.id)}
-                className="mt-4 px-4 py-2 bg-blue-600 text-white rounded-lg font-medium hover:bg-blue-700 transition"
+              <Link
+                href={`/products/${p.id}`}
+                className="mt-4 inline-block text-center px-4 py-2 bg-blue-600 text-white rounded-lg font-medium hover:bg-blue-700 transition"
               >
                 View Details
-              </button>
+              </Link>
             </div>
           </div>
         ))}
