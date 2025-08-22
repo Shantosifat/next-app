@@ -1,19 +1,49 @@
+"use client";
+
 import { products } from "@/lib/products";
-import Link from "next/link";
+import { useSession, signIn } from "next-auth/react";
+import { useRouter } from "next/navigation";
 
 export function ProductHighlights() {
+  const { data: session } = useSession();
+  const router = useRouter();
+
+  const handleViewDetails = (id: string) => {
+    if (!session) {
+      // Redirect to login if not logged in
+      router.push("/login");
+    } else {
+      // Go to product details page if logged in
+      router.push(`/products/${id}`);
+    }
+  };
+
   return (
-    <section className="py-10 grid grid-cols-1 md:grid-cols-3 gap-6 px-4">
-      {products.map((p) => (
-        <div key={p.id} className="border p-4 rounded shadow">
-          <h2 className="font-bold text-xl">{p.name}</h2>
-          <p>{p.description}</p>
-          <p className="font-semibold">${p.price}</p>
-          <Link href={`/products/${p.id}`} className="text-blue-500 mt-2 inline-block">
-            Details
-          </Link>
-        </div>
-      ))}
+    <section className="py-16 px-4 bg-gray-50">
+      <h2 className="text-3xl font-extrabold text-center mb-12 text-gray-900">
+        Featured Products
+      </h2>
+      <div className="grid grid-cols-1 sm:grid-cols-2 md:grid-cols-3 gap-8 max-w-6xl mx-auto">
+        {products.map((p) => (
+          <div
+            key={p.id}
+            className="bg-white rounded-xl shadow-lg overflow-hidden transform transition hover:-translate-y-2 hover:shadow-2xl"
+          >
+            {/* Product Info */}
+            <div className="p-6 flex flex-col gap-3">
+              <h3 className="text-xl font-bold text-gray-900">{p.name}</h3>
+              <p className="text-gray-700 line-clamp-3">{p.description}</p>
+              <p className="text-blue-600 font-semibold text-lg">${p.price}</p>
+              <button
+                onClick={() => handleViewDetails(p.id)}
+                className="mt-4 px-4 py-2 bg-blue-600 text-white rounded-lg font-medium hover:bg-blue-700 transition"
+              >
+                View Details
+              </button>
+            </div>
+          </div>
+        ))}
+      </div>
     </section>
   );
 }
