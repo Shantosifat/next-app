@@ -1,3 +1,5 @@
+import Link from "next/link";
+
 export function HeroSection() {
   return (
     <section className="relative text-center py-28 px-4 bg-gradient-to-r from-blue-600 to-indigo-500 text-white overflow-hidden">
@@ -15,12 +17,12 @@ export function HeroSection() {
         </p>
 
         {/* Call to Action */}
-        <a
+        <Link
           href="/products"
           className="px-8 py-4 bg-white text-blue-600 font-semibold rounded-full shadow-lg hover:shadow-xl hover:bg-gray-100 transition"
         >
           Shop Now
-        </a>
+        </Link>
       </div>
     </section>
   );

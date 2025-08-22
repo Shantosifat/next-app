@@ -1,4 +1,10 @@
-export const products  = [
+export type Product = {
+  id: string;
+  name: string;
+  description: string;
+  price: number;
+};
+export const products =[
   {
     id: "1",
     name: "Apple MacBook Pro 16\"",
