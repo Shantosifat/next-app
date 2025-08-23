@@ -3,7 +3,7 @@ export type Product = {
   name: string;
   description: string;
   price: number;
-  image: string; // new field for product image
+  image?: string; // new field for product image
 };
 
 export const products = [

@@ -1,14 +1,31 @@
-import { NextRequest, NextResponse } from "next/server";
-import { products } from "@/lib/products";
+import clientPromise from "@/lib/mongodb";
+import { ObjectId } from "mongodb";
 
-// Do NOT type the context explicitly; let Next.js infer it
-export async function GET(req: NextRequest, context: any) {
-  const id = context.params.id; // access id as usual
-  const product = products.find(p => p.id === id);
+export async function GET(req: Request, { params }: { params: { id: string } }) {
+  try {
+    const client = await clientPromise;
+    const db = client.db("test"); // your DB name
 
-  if (!product) {
-    return NextResponse.json({ error: "Not found" }, { status: 404 });
+    const product = await db
+      .collection("products")
+      .findOne({ _id: new ObjectId(params.id) });
+
+    if (!product) {
+      return new Response(JSON.stringify({ error: "Product not found" }), { status: 404 });
+    }
+
+    return new Response(
+      JSON.stringify({
+        id: product._id.toString(),
+        name: product.name,
+        description: product.description,
+        price: product.price,
+        image: product.image || "/images/placeholder.png",
+      }),
+      { status: 200 }
+    );
+  } catch (err) {
+    console.error(err);
+    return new Response(JSON.stringify({ error: "Invalid ID" }), { status: 400 });
   }
-
-  return NextResponse.json(product);
 }

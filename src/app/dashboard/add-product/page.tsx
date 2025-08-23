@@ -3,6 +3,8 @@
 import { useSession } from "next-auth/react";
 import { useRouter } from "next/navigation";
 import { useState, useEffect } from "react";
+import { toast, ToastContainer } from "react-toastify";
+import "react-toastify/dist/ReactToastify.css";
 
 export default function AddProductPage() {
   const { data: session, status } = useSession();
@@ -11,7 +13,9 @@ export default function AddProductPage() {
   const [name, setName] = useState("");
   const [description, setDescription] = useState("");
   const [price, setPrice] = useState("");
+  const [imageUrl, setImageUrl] = useState(""); // <-- use string for URL
   const [loading, setLoading] = useState(false);
+  
 
   // Redirect to login if not authenticated
   useEffect(() => {
@@ -23,32 +27,28 @@ export default function AddProductPage() {
   const handleSubmit = async (e: React.FormEvent) => {
     e.preventDefault();
 
-    if (!session) {
-      alert("You must be logged in to add a product");
-      return;
-    }
+    if (!session) return alert("You must be logged in to add a product");
 
     setLoading(true);
 
     try {
       const res = await fetch("/api/products", {
         method: "POST",
-        headers: {
-          "Content-Type": "application/json",
-        },
+        headers: { "Content-Type": "application/json" },
         body: JSON.stringify({
           name,
           description,
           price: Number(price),
+          image: imageUrl, // <-- send the URL directly
         }),
-        credentials: "include", // send cookies for JWT auth
       });
 
       if (!res.ok) {
-        const err = await res.json();
-        alert(err.error || "Failed to add product");
+        const err = await res.json().catch(() => ({}));
+        toast.error(err.error || "Failed to add product");
       } else {
-        alert("Product added successfully!");
+       
+        toast.success(`Product  added successfully!`);
         router.push("/products");
       }
     } catch (err) {
@@ -60,26 +60,27 @@ export default function AddProductPage() {
   };
 
   if (status === "loading" || !session) {
-    return <p className="text-center mt-8">Loading...</p>;
+    return <p className="text-center mt-8 text-gray-700">Loading...</p>;
   }
 
   return (
-    <div className="p-8 max-w-3xl mx-auto">
-      <h1 className="text-3xl font-bold mb-4 text-center">Add New Product</h1>
-      <form onSubmit={handleSubmit} className="flex flex-col space-y-4">
+    <div className="p-8 max-w-3xl mx-auto my-4 bg-cyan-900 shadow-md rounded-lg">
+      <h1 className="text-3xl font-bold mb-6 text-center text-white">Add New Product</h1>
+      <form onSubmit={handleSubmit} className="flex flex-col gap-4">
         <input
           type="text"
-          placeholder="Name"
+          placeholder="Product Name"
           value={name}
           onChange={(e) => setName(e.target.value)}
-          className="border p-2 rounded"
+          className="border p-3 rounded-lg focus:outline-none focus:ring-2 focus:ring-blue-500"
           required
         />
         <textarea
-          placeholder="Description"
+          placeholder="Product Description"
           value={description}
           onChange={(e) => setDescription(e.target.value)}
-          className="border p-2 rounded"
+          className="border p-3 rounded-lg focus:outline-none focus:ring-2 focus:ring-blue-500"
+          rows={4}
           required
         />
         <input
@@ -87,17 +88,25 @@ export default function AddProductPage() {
           placeholder="Price"
           value={price}
           onChange={(e) => setPrice(e.target.value)}
-          className="border p-2 rounded"
+          className="border p-3 rounded-lg focus:outline-none focus:ring-2 focus:ring-blue-500"
           required
+        />
+        <input
+          type="text"
+          placeholder="Image URL"
+          value={imageUrl}
+          onChange={(e) => setImageUrl(e.target.value)}
+          className="border p-3 rounded-lg focus:outline-none focus:ring-2 focus:ring-blue-500"
         />
         <button
           type="submit"
           disabled={loading}
-          className="bg-blue-500 text-white p-2 rounded disabled:opacity-50"
+          className="bg-blue-600 text-white p-3 rounded-lg font-semibold hover:bg-blue-700 transition disabled:opacity-50"
         >
           {loading ? "Adding..." : "Add Product"}
         </button>
       </form>
+      <ToastContainer position="top-right" autoClose={3000} hideProgressBar={false} />
     </div>
   );
 }
