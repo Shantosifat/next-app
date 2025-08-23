@@ -49,7 +49,12 @@ export default function AddProductPage() {
       } else {
        
         toast.success(`Product  added successfully!`);
-        router.push("/products");
+        // RESET THE FORM
+      setName("");
+      setDescription("");
+      setPrice("");
+      setImageUrl("");
+        
       }
     } catch (err) {
       console.error(err);

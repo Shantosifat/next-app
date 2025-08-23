@@ -1,8 +1,6 @@
-// lib/db.ts
-import { getDbClient } from "./mongodb";
+import clientPromise from "./mongodb";
 
 export async function getDb() {
-  const client = await getDbClient();
-  const dbName = process.env.MONGODB_DB || "nextApp"; // fallback
-  return client.db(dbName);
+  const client = await clientPromise; // just await the clientPromise
+  return client.db(process.env.MONGODB_DB); // use your DB name
 }
